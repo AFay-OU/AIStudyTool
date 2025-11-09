@@ -1,8 +1,14 @@
 package org.aistudytool.aistudytool;
 
+import java.awt.*;
+
 public class Screenshot {
 
-    ScreenshotHandler sh = new ScreenshotHandler();
+
+    public static void main (String[] args) {
+        // Screenshot Test
+        javax.swing.SwingUtilities.invokeLater(ScreenshotHandler::new);
+    }
 
     public void screenshot(){
 

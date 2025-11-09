@@ -4,6 +4,7 @@ module org.aistudytool.aistudytool {
 
     requires org.controlsfx.controls;
     requires org.kordamp.bootstrapfx.core;
+    requires java.desktop;
 
     opens org.aistudytool.aistudytool to javafx.fxml;
     exports org.aistudytool.aistudytool;
