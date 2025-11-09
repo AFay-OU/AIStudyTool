@@ -6,11 +6,15 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ScreenshotHandler extends JWindow{
 
     private Point startPoint;
     private final Rectangle selection = new Rectangle();
+    private static final Logger logger = Logger.getLogger(ScreenshotHandler.class.getName());
 
     public ScreenshotHandler() {
         setBackground(new Color(0,0,0,0));
@@ -27,13 +31,14 @@ public class ScreenshotHandler extends JWindow{
                     BufferedImage sh = robot.createScreenCapture(selection);
 
                     File dir = new File("Screenshots");
-                    if (!dir.exists()) dir.mkdirs();
+                    if (!dir.exists() && !dir.mkdirs()) {
+                        throw new IOException("Failed to create directory: " + dir.getAbsolutePath());
+                    }
 
                     ImageIO.write(sh, "png", new java.io.File("Screenshots/screenshot.png"));
                     System.out.println("Screenshot saved to: " + dir.getAbsolutePath());
                 } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
+                    logger.log(Level.SEVERE, "Screenshot capture failed", ex);                }
                 dispose();
             }
         });
