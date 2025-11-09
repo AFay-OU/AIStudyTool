@@ -6,4 +6,6 @@ A Java/Maven project implementing captured text for LLM JSON conversion
 ## Dependencies
 [JavaFX](https://github.com/openjdk/jfx): GUI
 
-[Tess4j](https://tess4j.sourceforge.net/): Image to Text Library using a TesseractOCR wrapper for Java
+[TesseractOCR](https://github.com/tesseract-ocr/tesseract/): Image to Text Library
+
+[Tess4j](https://tess4j.sourceforge.net/): TesseractOCR wrapper for Java
