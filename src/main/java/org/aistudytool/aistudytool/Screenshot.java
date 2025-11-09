@@ -1,6 +1,6 @@
 package org.aistudytool.aistudytool;
 
-import java.awt.*;
+
 
 public class Screenshot {
 
