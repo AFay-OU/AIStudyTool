@@ -7,6 +7,7 @@ module org.aistudytool.aistudytool {
     requires java.desktop;
     requires java.logging;
     requires tess4j;
+    requires com.google.gson;
 
     opens org.aistudytool.aistudytool to javafx.fxml;
     exports org.aistudytool.aistudytool;
