@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.Font?>
+<?import javafx.geometry.Insets?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/25"
+            xmlns:fx="http://javafx.com/fxml/1"
+            prefWidth="640.0" prefHeight="480.0"
+            fx:controller="org.aistudytool.aistudytool.FlashcardGUIController">
+
+    <BorderPane prefWidth="640" prefHeight="480" style="-fx-background-color: #BDC2C6;">
+
+        <top>
+            <StackPane prefHeight="160" BorderPane.alignment="CENTER">
+                <Path fill="#848a98" stroke="#848a98" strokeType="INSIDE">
+                    <elements>
+                        <MoveTo x="0" y="0" />
+                        <HLineTo x="640.0" />
+                        <VLineTo y="60.0" />
+                        <ArcTo radiusX="320.0"
+                               radiusY="60.0"
+                               x="0"
+                               y="60.0"
+                               sweepFlag="true"/>
+                    </elements>
+                </Path>
+                <VBox alignment="TOP_CENTER" spacing="5">
+                    <MenuBar>
+                        <Menu text="File">
+                            <MenuItem text="Load Deck" onAction="#onLoadDeck"/>
+                            <MenuItem text="Save Deck" onAction="#onSaveDeck"/>
+                        </Menu>
+                        <Menu text="Flashcards">
+                            <MenuItem text="Add New Card" onAction="#onAddCard"/>
+                            <MenuItem text="Review Cards" onAction="#onReview"/>
+                        </Menu>
+                        <Menu text="Create From">
+                            <MenuItem text="Screenshot" onAction="#onStartScreenshot"/>
+                            <MenuItem text="PDF Upload" onAction="#onStartPDFUpload"/>
+                        </Menu>
+                    </MenuBar>
+                    <Label text="FLASHCARD" translateY="20">
+                        <font><Font name="Cambria Bold" size="30"/></font>
+                    </Label>
+                </VBox>
+            </StackPane>
+        </top>
+
+        <left>
+            <VBox spacing="12" BorderPane.alignment="TOP_CENTER">
+                <padding>
+                    <Insets top="20" right="20" bottom="20" left="20"/>
+                </padding>
+                <Button text="Add Card" prefWidth="120" onAction="#onAddCard"/>
+                <Button text="Load Deck" prefWidth="120" onAction="#onLoadDeck"/>
+                <Button text="Save Deck" prefWidth="120" onAction="#onSaveDeck"/>
+                <Button text="Review" prefWidth="120" onAction="#onReview"/>
+            </VBox>
+        </left>
+
+        <center>
+            <AnchorPane>
+                <VBox fx:id="flashcardPanel"
+                      alignment="CENTER"
+                      spacing="20"
+                      layoutX="50" layoutY="30"
+                      style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #555; -fx-border-radius: 10;"
+                      prefWidth="350" prefHeight="250">
+                    <Label fx:id="questionLabel" text="Question" wrapText="true">
+                        <font>
+                            <Font size="20"/>
+                        </font>
+                    </Label>
+                    <Label fx:id="answerLabel" text="Answer" wrapText="true" visible="false">
+                        <font>
+                            <Font size="18"/>
+                        </font>
+                    </Label>
+                    <HBox alignment="CENTER" spacing="10">
+                        <Button text="Show Answer" onAction="#onShowAnswer"/>
+                        <Button fx:id="correctButton" text="Correct" disable="true" onAction="#onCorrect"/>
+                        <Button fx:id="wrongButton" text="Wrong" disable="true" onAction="#onWrong"/>
+                    </HBox>
+                </VBox>
+            </AnchorPane>
+        </center>
+    </BorderPane>
+</AnchorPane>

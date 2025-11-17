@@ -9,6 +9,6 @@ module org.aistudytool.aistudytool {
     requires tess4j;
     requires com.google.gson;
 
-    opens org.aistudytool.aistudytool to javafx.fxml;
+    opens org.aistudytool.aistudytool to javafx.fxml, com.google.gson;
     exports org.aistudytool.aistudytool;
 }

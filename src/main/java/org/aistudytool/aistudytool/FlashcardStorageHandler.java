@@ -8,7 +8,7 @@ public class FlashcardStorageHandler {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    private void saveFC(FlashcardController set, String filename) throws IOException {
+    public static void saveFC(FlashcardController set, String filename) throws IOException {
         try (FileWriter fw = new FileWriter(filename)) {
             gson.toJson(set, fw);
         }
