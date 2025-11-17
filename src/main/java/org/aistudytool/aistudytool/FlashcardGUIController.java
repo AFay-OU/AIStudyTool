@@ -180,14 +180,7 @@ public class FlashcardGUIController {
     }
 
     private void startPDFUploadMode() {
-        FileChooser fc = new FileChooser();
-        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
-        File file = fc.showOpenDialog(null);
-
-        if (file == null) return;
-
-        // TODO: integrate your PDFHandler OCR
-        showInfo("PDF selected: " + file.getName() + "\n(Implement text extraction next)");
+        // TODO: integrate PDFHandler
     }
 
 
