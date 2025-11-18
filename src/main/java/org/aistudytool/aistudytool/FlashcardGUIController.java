@@ -1,9 +1,14 @@
 package org.aistudytool.aistudytool;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,13 +37,18 @@ public class FlashcardGUIController {
     }
 
     private void refreshList() {
-        if (flashcardList != null){
-            flashcardList.getItems().clear();
-            for (Flashcard c : deck.getFlashcards()) {
-                flashcardList.getItems().add("[" + c.getCategory() + "] " + c.getQuestion());
-            }
+        if (flashcardList == null) return;
+
+        flashcardList.getItems().clear();
+
+        Deck active = DeckHandler.getActiveDeck();
+        if (active == null) return;
+
+        for (Flashcard c : active.getCards()) {
+            flashcardList.getItems().add("[" + c.getCategory() + "] " + c.getQuestion());
         }
     }
+
 
     private Flashcard currentCard;
 
@@ -86,47 +96,52 @@ public class FlashcardGUIController {
         String a = aDialog.showAndWait().orElse(null);
         if (a == null) return;
 
-        String category = (categoryCombo.getValue() != null)
-                ? categoryCombo.getValue()
-                : "General";
-
         Flashcard card = new Flashcard(q, a);
-        card.setCategory(category);
 
-        deck.addCard(card);
+        // Ask user which deck to save to
+        Deck chosenDeck = chooseDeckForNewCard();
+        if (chosenDeck == null) return;
+
+        chosenDeck.addCard(card);
+
+        DeckHandler.setActiveDeck(chosenDeck);
         refreshList();
     }
 
 
+
     @FXML
-    public void onSaveDeck(){
+    public void onSaveAllDecks() {
         FileChooser fc = new FileChooser();
-        fc.setTitle("deck.json");
+        fc.setTitle("Save All Decks");
         File file = fc.showSaveDialog(null);
-
-        if (file != null){
-            try {
-                FlashcardStorageHandler.saveFC(deck, file.getAbsolutePath());
-            } catch (IOException e){
-                showError(e.getMessage());
-            }
-        }
-    }
-
-    @FXML
-    public void onLoadDeck() {
-        FileChooser fc = new FileChooser();
-        File file = fc.showOpenDialog(null);
 
         if (file != null) {
             try {
-                deck = FlashcardStorageHandler.loadFC(file.getAbsolutePath());
-                refreshList();
+                FlashcardStorageHandler.saveAllDecks(file.getAbsolutePath());
+                showInfo("Saved all decks.");
             } catch (IOException e) {
                 showError(e.getMessage());
             }
         }
     }
+
+    @FXML
+    public void onLoadAllDecks() {
+        FileChooser fc = new FileChooser();
+        File file = fc.showOpenDialog(null);
+
+        if (file != null) {
+            try {
+                FlashcardStorageHandler.loadAllDecks(file.getAbsolutePath());
+                refreshList();
+                showInfo("Loaded all decks.");
+            } catch (IOException e) {
+                showError(e.getMessage());
+            }
+        }
+    }
+
 
     @FXML
     public void onReview() {
@@ -174,6 +189,12 @@ public class FlashcardGUIController {
     private void startScreenshotMode() {
         try {
             ScreenshotHandler sh = new ScreenshotHandler();
+
+            sh.setOnOCRComplete(text -> {
+                // Run on JavaFX thread
+                Platform.runLater(() -> showOCRConfirmation(text));
+            });
+
         } catch (Exception e) {
             showError("Screenshot failed: " + e.getMessage());
         }
@@ -190,5 +211,74 @@ public class FlashcardGUIController {
 
     private void showInfo(String msg) {
         new Alert(Alert.AlertType.INFORMATION, msg).show();
+    }
+
+    @FXML
+    public void onNewDeck() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setHeaderText("Create New Deck");
+        dialog.setContentText("Enter deck name:");
+
+        String name = dialog.showAndWait().orElse(null);
+        if (name == null || name.trim().isEmpty()) return;
+
+        Deck deck = new Deck(name.trim());
+        DeckHandler.addDeck(deck);
+        DeckHandler.setActiveDeck(deck);
+
+        showInfo("Created new deck: " + name);
+
+        refreshList();
+    }
+
+    private Deck chooseDeckForNewCard() {
+        List<Deck> decks = DeckHandler.getDecks();
+
+        ChoiceDialog<Deck> dialog =
+                new ChoiceDialog<>(DeckHandler.getActiveDeck(), decks);
+
+        dialog.setHeaderText("Choose Deck");
+        dialog.setContentText("Select which deck to save this flashcard to:");
+
+        return dialog.showAndWait().orElse(null);
+    }
+
+    private void showOCRConfirmation(String rawText) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("ExtractedTextDialog.fxml"));
+            Parent root = loader.load();
+
+            ExtractedTextDialogController controller = loader.getController();
+            controller.setInitialText(rawText);
+
+            controller.setOnConfirm(finalText -> {
+                createFlashcardsFromExtractedText(finalText);
+            });
+
+            controller.setOnRetry(() -> {
+                Platform.runLater(() -> startScreenshotMode());
+            });
+
+            Stage stage = new Stage();
+            stage.setTitle("Confirm Extracted Text");
+            stage.setScene(new Scene(root));
+            stage.show();
+
+        } catch (Exception e) {
+            showError("Failed to open confirmation dialog: " + e.getMessage());
+        }
+    }
+
+    private void createFlashcardsFromExtractedText(String text) {
+        String[] lines = text.split("\n");
+
+        for (String line : lines) {
+            if (line.trim().isEmpty()) continue;
+
+            Flashcard card = new Flashcard(line.trim(), ""); // Answer empty for now
+            deck.addCard(card);
+        }
+
+        refreshList();
     }
 }

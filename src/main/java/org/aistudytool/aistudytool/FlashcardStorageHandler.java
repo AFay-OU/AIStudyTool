@@ -8,17 +8,25 @@ public class FlashcardStorageHandler {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    public static void saveFC(FlashcardController set, String filename) throws IOException {
+    public static void saveAllDecks(String filename) throws IOException {
         try (FileWriter fw = new FileWriter(filename)) {
-            gson.toJson(set, fw);
+            gson.toJson(DeckHandler.getDecks(), fw);
         }
     }
 
-    public static FlashcardController loadFC(String filename) throws IOException {
+    public static void loadAllDecks(String filename) throws IOException {
         try (FileReader fr = new FileReader(filename)) {
-            return gson.fromJson(fr, FlashcardController.class);
+            Deck[] loaded = gson.fromJson(fr, Deck[].class);
+            DeckHandler.getDecks().clear();
+            for (Deck d : loaded) {
+                DeckHandler.addDeck(d);
+            }
+            if (DeckHandler.getDecks().size() > 0) {
+                DeckHandler.setActiveDeck(DeckHandler.getDecks().get(0));
+            }
         }
     }
+
 
     private void viewFC(){
 

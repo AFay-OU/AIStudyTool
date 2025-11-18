@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,6 +21,7 @@ public class ScreenshotHandler extends JWindow {
     private Point startPoint;
     private final Rectangle selection = new Rectangle();
     private static final Logger logger = Logger.getLogger(ScreenshotHandler.class.getName());
+    private Consumer<String> onOCRComplete;
 
     public ScreenshotHandler() {
         setBackground(new Color(0, 0, 0, 0));
@@ -99,6 +101,8 @@ public class ScreenshotHandler extends JWindow {
 
         try {
             File tessDataDir = null;
+
+            // Try to locate tessdata inside resources
             try {
                 tessDataDir = new File(Objects.requireNonNull(
                         ScreenshotHandler.class.getClassLoader().getResource("tessdata/eng.traineddata")
@@ -106,8 +110,9 @@ public class ScreenshotHandler extends JWindow {
             } catch (Exception ignored) {
             }
 
-            // Fallback to absolute project or system path
+            // Fallback: project build path or system installation
             if (tessDataDir == null || !tessDataDir.exists()) {
+
                 File projectTess = new File("target/classes/tessdata");
                 File systemTess = new File("/usr/share/tesseract-ocr/5/tessdata");
 
@@ -125,10 +130,11 @@ public class ScreenshotHandler extends JWindow {
 
             System.out.println("Using tessdata directory: " + tessDataDir.getAbsolutePath());
 
-            // Configure tesseract
+            // Configure Tesseract
             tesseract.setDatapath(tessDataDir.getAbsolutePath());
             tesseract.setLanguage("eng");
 
+            // Screenshot file
             File imageFile = new File("Screenshots/screenshot.png");
             if (!imageFile.exists()) {
                 logger.severe("Screenshot not found: " + imageFile.getAbsolutePath());
@@ -136,8 +142,16 @@ public class ScreenshotHandler extends JWindow {
             }
 
             System.out.println("Performing OCR on: " + imageFile.getAbsolutePath());
+
+            // RUN OCR
             String text = tesseract.doOCR(imageFile);
+
             System.out.println("Extracted text:\n" + text);
+
+            // 🔥 NEW: Fire callback if GUI wants the OCR output
+            if (onOCRComplete != null) {
+                onOCRComplete.accept(text);
+            }
 
         } catch (TesseractException e) {
             logger.log(Level.SEVERE, "OCR processing failed", e);
@@ -145,4 +159,10 @@ public class ScreenshotHandler extends JWindow {
             logger.log(Level.SEVERE, "Unexpected error during OCR", e);
         }
     }
+
+
+    public void setOnOCRComplete(Consumer<String> callback){
+        this.onOCRComplete = callback;
+    }
+
 }

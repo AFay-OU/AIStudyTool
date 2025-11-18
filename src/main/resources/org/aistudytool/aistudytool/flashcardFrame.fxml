@@ -30,8 +30,9 @@
                 <VBox alignment="TOP_CENTER" spacing="5">
                     <MenuBar>
                         <Menu text="File">
-                            <MenuItem text="Load Deck" onAction="#onLoadDeck"/>
-                            <MenuItem text="Save Deck" onAction="#onSaveDeck"/>
+                            <MenuItem text="Save Decks" onAction="#onSaveAllDecks"/>
+                            <MenuItem text="Load Decks" onAction="#onLoadAllDecks"/>
+                            <MenuItem text="New Deck" onAction="#onNewDeck"/>
                         </Menu>
                         <Menu text="Flashcards">
                             <MenuItem text="Add New Card" onAction="#onAddCard"/>
@@ -55,8 +56,6 @@
                     <Insets top="20" right="20" bottom="20" left="20"/>
                 </padding>
                 <Button text="Add Card" prefWidth="120" onAction="#onAddCard"/>
-                <Button text="Load Deck" prefWidth="120" onAction="#onLoadDeck"/>
-                <Button text="Save Deck" prefWidth="120" onAction="#onSaveDeck"/>
                 <Button text="Review" prefWidth="120" onAction="#onReview"/>
             </VBox>
         </left>

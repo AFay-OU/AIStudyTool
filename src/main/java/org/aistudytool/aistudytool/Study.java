@@ -34,24 +34,4 @@ public class Study {
 
         card.setNextReview(timestamp);
     }
-
-    private void studyFC(){
-
-    }
-
-    public void displayDue(){
-
-    }
-
-    private void answer(){
-
-    }
-
-    public void displayAnswer(){
-
-    }
-
-    public void displayNext(){
-
-    }
 }
