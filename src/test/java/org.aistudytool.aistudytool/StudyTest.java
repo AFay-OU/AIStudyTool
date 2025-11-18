@@ -13,7 +13,7 @@ public class StudyTest {
 
     @BeforeEach
     public void setup() {
-        card = new Flashcard("What is 2+2?", "4");
+        card = new Flashcard("Q1", "A2");
         card.setNextReview(0);
         card.setBox(1);
     }
