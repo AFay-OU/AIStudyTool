@@ -53,24 +53,4 @@ public class Flashcard {
     public void setCategory(String category) {
         this.category = category;
     }
-
-    private void createFlashcard(){
-
-    }
-
-    private void previewFC(){
-
-    }
-
-    private void editFC(){
-
-    }
-
-    public void displayFCSets(){
-
-    }
-
-    public void displayAllFC(){
-
-    }
 }

@@ -26,17 +26,4 @@ public class FlashcardStorageHandler {
             }
         }
     }
-
-
-    private void viewFC(){
-
-    }
-
-    private void pickSet(){
-
-    }
-
-    private void fetchDue(){
-
-    }
 }
