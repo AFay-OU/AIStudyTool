@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx/8"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.aistudytool.aistudytool.AIPreviewController"
+      spacing="15"
+      style="-fx-background-color: white; -fx-border-color: #BDC2C6; -fx-border-radius: 10; -fx-background-radius: 10;">
+
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+
+    <Label text="Flashcard Preview">
+        <font><Font name="Cambria Bold" size="22"/></font>
+    </Label>
+
+    <Label text="Question:" style="-fx-font-weight: bold;"/>
+    <TextArea fx:id="questionArea" editable="false" wrapText="true"/>
+
+    <Label text="Answer:" style="-fx-font-weight: bold;"/>
+    <TextArea fx:id="answerArea" editable="false" wrapText="true"/>
+
+    <HBox spacing="10" alignment="CENTER">
+        <Button fx:id="addButton" text="Add to Deck" onAction="#onAdd"/>
+        <Button fx:id="retryButton" text="Retry" onAction="#onRetry"/>
+        <Button fx:id="editButton" text="Edit" onAction="#onEdit"/>
+        <Button fx:id="cancelButton" text="Cancel" onAction="#onCancel"/>
+    </HBox>
+
+</VBox>

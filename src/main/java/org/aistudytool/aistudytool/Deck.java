@@ -20,6 +20,23 @@ public class Deck {
         cards.add(card);
     }
 
+    public int getTotalCards() {
+        return cards.size();
+    }
+
+    public int getDueCards() {
+        long now = System.currentTimeMillis();
+        return (int) cards.stream()
+                .filter(c -> c.getNextReview() <= now)
+                .count();
+    }
+
+    public int getNewCards() {
+        return (int) cards.stream()
+                .filter(c -> c.getBox() == 1)
+                .count();
+    }
+
     @Override
     public String toString() {
         return name;

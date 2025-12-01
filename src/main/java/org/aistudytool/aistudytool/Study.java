@@ -33,5 +33,6 @@ public class Study {
         long timestamp = nextDate.atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000;
 
         card.setNextReview(timestamp);
+        System.out.println("Next review: " + card.getNextReview());
     }
 }

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.aistudytool.aistudytool.PDFViewController"
+            prefWidth="900" prefHeight="700">
+
+    <top>
+        <VBox spacing="5">
+            <HBox spacing="10">
+                <padding>
+                    <Insets top="10" right="10" bottom="5" left="10"/>
+                </padding>
+
+                <!-- Page navigation -->
+                <Button text="Prev" onAction="#onPrevPage"/>
+                <Button text="Next" onAction="#onNextPage"/>
+
+                <!-- Zoom -->
+                <Button text="Zoom -" onAction="#onZoomOut"/>
+                <Button text="Zoom +" onAction="#onZoomIn"/>
+                <Button text="Reset" onAction="#onZoomReset"/>
+
+                <!-- Mode toggle -->
+                <ToggleButton fx:id="selectModeToggle"
+                              text="Select Mode"
+                              onAction="#onToggleSelectMode"/>
+
+                <Button text="Confirm" onAction="#onConfirm"/>
+                <Button text="Close" onAction="#onCancel"/>
+
+                <Label fx:id="pageLabel" text="Page 1"/>
+            </HBox>
+        </VBox>
+    </top>
+
+
+    <center>
+        <ScrollPane fx:id="scrollPane" pannable="true">
+            <content>
+                <StackPane fx:id="pdfContainer">
+                    <ImageView fx:id="pdfImageView"
+                               preserveRatio="true"
+                               smooth="true"/>
+                    <!-- Transparent overlay for highlight -->
+                    <Pane fx:id="overlayPane" pickOnBounds="true" />
+                </StackPane>
+            </content>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.aistudytool.aistudytool.FlashcardEditorController"
+            prefWidth="600" prefHeight="400">
+    <left>
+        <VBox spacing="10">
+            <padding>
+                <Insets top="10" right="10" bottom="5" left="10"/>
+            </padding>
+
+            <Label text="Flashcards in Deck:"/>
+            <ListView fx:id="flashcardListView" prefWidth="200" />
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="10">
+            <padding>
+                <Insets top="10" right="10" bottom="5" left="10"/>
+            </padding>
+
+            <Label text="Question:"/>
+            <TextArea fx:id="questionArea" prefHeight="100"/>
+
+            <Label text="Answer:"/>
+            <TextArea fx:id="answerArea" prefHeight="100"/>
+
+            <HBox spacing="10">
+                <Button text="Save" onAction="#onSave"/>
+                <Button text="Delete" onAction="#onDelete"/>
+                <Button text="Cancel" onAction="#onCancel"/>
+            </HBox>
+        </VBox>
+    </center>
+
+</BorderPane>
