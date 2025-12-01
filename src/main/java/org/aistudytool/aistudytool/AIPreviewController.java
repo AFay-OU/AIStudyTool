@@ -70,7 +70,6 @@ public class AIPreviewController {
 
 
     private void chooseDeckForFlashcard() {
-        // Fetch deck names
         var deckNames = DeckHandler.getDecks()
                 .stream()
                 .map(Deck::getName)

@@ -242,7 +242,6 @@ public class FlashcardGUIController {
             return;
         }
 
-        // Switch to review mode
         startFullReviewMode(selectedDeck);
     }
 
@@ -284,7 +283,6 @@ public class FlashcardGUIController {
         answerLabel.setText(card.getAnswer());
         answerLabel.setVisible(false);
 
-        // Disable spaced repetition buttons but show them
         correctButton.setText("Next");
         wrongButton.setText("Back");
 
@@ -298,7 +296,6 @@ public class FlashcardGUIController {
     private void endFullReviewMode() {
         inFullReviewMode = false;
 
-        // Reset button text
         correctButton.setText("Correct");
         wrongButton.setText("Wrong");
 
@@ -453,7 +450,6 @@ public class FlashcardGUIController {
                 refreshDeckSummaryList();
                 refreshList();
 
-                // Return UI to Home mode
                 topTitleLabel.setText("AI Study Tool");
                 deckListPanel.setVisible(true);
                 deckListPanel.setManaged(true);
@@ -612,7 +608,7 @@ public class FlashcardGUIController {
             controller.loadPDF(file);
             controller.setOnConfirm(text -> Platform.runLater(() -> showOCRConfirmation(text)));
 
-            controller.displayPage(page); // Go to correct page
+            controller.displayPage(page);
 
             controller.restoreSelection(nx, ny, nw, nh);
 
@@ -629,10 +625,8 @@ public class FlashcardGUIController {
 
     private void createFlashcardsFromExtractedText(String confirmedText) {
         try {
-            // Generate flashcard using LLM
             aiGeneratedCard = llm.generateFlashcard(confirmedText);
 
-            // Fill preview UI
             aiQuestionLabel.setText(aiGeneratedCard.getQuestion());
             aiAnswerLabel.setText(aiGeneratedCard.getAnswer());
 
@@ -703,7 +697,6 @@ public class FlashcardGUIController {
         );
     }
 
-    // Helpers
     private void showError(String msg) {
         new Alert(Alert.AlertType.ERROR, msg).show();
     }

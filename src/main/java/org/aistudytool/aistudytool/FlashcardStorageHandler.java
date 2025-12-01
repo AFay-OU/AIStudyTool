@@ -32,7 +32,6 @@ public class FlashcardStorageHandler {
         }
     }
 
-
     public static void saveAllDecks(String filename) throws IOException {
         List<Deck> decks = DeckHandler.getDecks();
 

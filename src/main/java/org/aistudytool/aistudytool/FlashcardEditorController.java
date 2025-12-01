@@ -38,6 +38,7 @@ public class FlashcardEditorController {
         selectedCard.setQuestion(questionArea.getText());
         selectedCard.setAnswer(answerArea.getText());
 
+        // Update list label
         int i = deck.getCards().indexOf(selectedCard);
         flashcardListView.getItems().set(i, selectedCard.getQuestion());
 

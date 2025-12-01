@@ -21,7 +21,6 @@ public class ExtractedTextDialogController {
         this.onConfirmCallback = callback;
     }
 
-    // NEW
     public void setOnRetry(Runnable callback) {
         this.onRetryCallback = callback;
     }

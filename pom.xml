@@ -160,7 +160,7 @@
                     <vendor>Fay</vendor>
                     <appVersion>1.0.0</appVersion>
                     <!-- EXE (Windows), DMG (macOS), DEB (Linux) -->
-                    <type>DMG</type>
+                    <type>DEB</type>
 
                     <javaOptions>
                         <javaOption>--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED</javaOption>
@@ -170,7 +170,5 @@
 
         </plugins>
     </build>
-
-
 
 </project>
