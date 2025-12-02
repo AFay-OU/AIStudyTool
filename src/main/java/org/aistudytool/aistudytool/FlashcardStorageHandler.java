@@ -32,6 +32,37 @@ public class FlashcardStorageHandler {
         }
     }
 
+    public static boolean deleteDeck(String deckName) {
+        List<Deck> decks = DeckHandler.getDecks();
+
+        Deck toRemove = null;
+        for (Deck d : decks) {
+            if (d.getName().equals(deckName)) {
+                toRemove = d;
+                break;
+            }
+        }
+
+        if (toRemove == null)
+            return false;
+
+        decks.remove(toRemove);
+
+        if (DeckHandler.getActiveDeck() == toRemove) {
+            if (!decks.isEmpty()) {
+                DeckHandler.setActiveDeck(decks.get(0));
+            } else {
+                Deck fresh = new Deck("Default Deck");
+                decks.add(fresh);
+                DeckHandler.setActiveDeck(fresh);
+            }
+        }
+
+        autoSave();
+        return true;
+    }
+
+
 
     public static void saveAllDecks(String filename) throws IOException {
         List<Deck> decks = DeckHandler.getDecks();

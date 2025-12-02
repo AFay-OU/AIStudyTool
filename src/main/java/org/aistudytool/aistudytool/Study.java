@@ -25,6 +25,19 @@ public class Study {
         updateNextReview(card);
     }
 
+    public static String getTimeUntilReview(Flashcard card) {
+        long now = System.currentTimeMillis();
+        long next = card.getNextReview();
+
+        long diff = next - now;
+        if (diff <= 0) return "Due now";
+
+        long hours = diff / (1000 * 60 * 60);
+        long minutes = (diff / (1000 * 60)) % 60;
+
+        return hours + "h " + minutes + "m";
+    }
+
     private  static void updateNextReview(Flashcard card){
         int box = card.getBox();
         int days = intervals[box];
@@ -33,6 +46,7 @@ public class Study {
         long timestamp = nextDate.atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000;
 
         card.setNextReview(timestamp);
-        System.out.println("Next review: " + card.getNextReview());
+        String timeStr = Study.getTimeUntilReview(card);
+        System.out.println("Next review: " + timeStr);
     }
 }

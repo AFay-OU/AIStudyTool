@@ -42,6 +42,10 @@ public class DeckHandler {
         return null;
     }
 
+    public static boolean removeDeck(String name) {
+        return DeckHandler.getDecks().removeIf(d -> d.getName().equals(name));
+    }
+
     public static int countDueCards(Deck deck) {
         if (deck == null) return 0;
 

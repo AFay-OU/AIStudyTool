@@ -229,7 +229,6 @@ public class FlashcardGUIController {
             return;
         }
 
-        // Let the user choose a deck
         ChoiceDialog<Deck> dialog = new ChoiceDialog<>(DeckHandler.getActiveDeck(), decks);
         dialog.setHeaderText("Choose a Deck to Review");
         dialog.setContentText("Select a deck:");
@@ -242,7 +241,6 @@ public class FlashcardGUIController {
             return;
         }
 
-        // Switch to review mode
         startFullReviewMode(selectedDeck);
     }
 
@@ -439,6 +437,80 @@ public class FlashcardGUIController {
 
         openFlashcardEditor(chosenDeck);
     }
+
+    @FXML
+    private void deleteDeck() {
+        List<Deck> decks = DeckHandler.getDecks();
+
+        if (decks.isEmpty()) {
+            showError("There are no decks to delete.");
+            return;
+        }
+
+        // Convert deck list to names for the drop-down list
+        List<String> deckNames = DeckHandler.getDeckNames();
+
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(
+                DeckHandler.getActiveDeck() != null ? DeckHandler.getActiveDeck().getName() : deckNames.get(0),
+                deckNames
+        );
+
+        dialog.setTitle("Delete Deck");
+        dialog.setHeaderText("Select a deck to delete");
+        dialog.setContentText("Choose deck:");
+
+        String chosen = dialog.showAndWait().orElse(null);
+        if (chosen == null) return; // cancelled
+
+        // Confirm deletion
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirm Delete");
+        confirm.setHeaderText("Delete Deck: " + chosen);
+        confirm.setContentText("This action cannot be undone.\nAre you sure?");
+
+        if (confirm.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK)
+            return;
+
+        // Delete deck
+        boolean success = FlashcardStorageHandler.deleteDeck(chosen);
+
+        if (!success) {
+            showError("Failed to delete deck.");
+            return;
+        }
+
+        // Refresh UI
+        refreshDeckDisplay();
+    }
+
+
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+
+    private void refreshDeckDisplay() {
+        refreshDeckSummaryList();
+
+        Deck active = DeckHandler.getActiveDeck();
+        if (active != null) {
+            updateTopLabelStats(active);
+            refreshList();
+        } else {
+            topTitleLabel.setText("AI Study Tool");
+            flashcardPanel.setVisible(false);
+            flashcardPanel.setManaged(false);
+            deckListPanel.setVisible(true);
+            deckListPanel.setManaged(true);
+        }
+        showDeckListView();
+    }
+
+
 
 
     private void openFlashcardEditor(Deck deck) {
@@ -684,8 +756,6 @@ public class FlashcardGUIController {
             showError("Failed to open AI preview window: " + e.getMessage());
         }
     }
-
-
 
 
     private void updateTopLabelStats(Deck deck) {
