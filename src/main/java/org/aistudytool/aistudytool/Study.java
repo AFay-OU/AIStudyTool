@@ -12,18 +12,34 @@ public class Study {
     };
 
     public static void markCorrect(Flashcard card){
-        int currentBox = card.getBox();
-
-        if (currentBox < 5) {
-            card.setBox(currentBox + 1);
+        card.setSeen();
+        int box = card.getBox();
+        if (box == 1) {
+            card.setNextReview(
+                    System.currentTimeMillis() + 24L * 60L * 60L * 1000L
+            );
+            System.out.println("Next review: 24h (still learning)");
+            return;
         }
+        if (box < 5) {
+            card.setBox(box + 1);
+        }
+
         updateNextReview(card);
     }
 
     public static void markIncorrect(Flashcard card){
+        if (!card.isSeen()) {
+            card.setSeen();
+        }
+
         card.setBox(1);
-        updateNextReview(card);
+
+        card.setNextReview(System.currentTimeMillis());
+        System.out.println("Next review: Due immediately");
     }
+
+
 
     public static String getTimeUntilReview(Flashcard card) {
         long now = System.currentTimeMillis();

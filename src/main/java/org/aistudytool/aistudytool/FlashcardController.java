@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 
 public class FlashcardController {
 
-    public List<Flashcard> cards = new ArrayList<>();
-    public String name = "Untitled Deck";
+    private final List<Flashcard> cards = new ArrayList<>();
+    private String name = "Untitled Deck";
 
     public List<Flashcard> getFlashcards() {
         return cards;
@@ -27,6 +27,30 @@ public class FlashcardController {
 
     public List<Flashcard> dueCards() {
         long now = System.currentTimeMillis();
-        return cards.stream().filter(c -> c.getNextReview() <= now).collect(Collectors.toList());
+        return cards.stream()
+                .filter(c -> c.getNextReview() <= now)
+                .collect(Collectors.toList());
+    }
+
+    public int getTotalCards() {
+        return cards.size();
+    }
+
+    public int getDueCards() {
+        long now = System.currentTimeMillis();
+        return (int) cards.stream()
+                .filter(c -> c.getNextReview() <= now)
+                .count();
+    }
+
+    public int getNewCards() {
+        return (int) cards.stream()
+                .filter(c -> c.getBox() == 1)
+                .count();
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

@@ -8,12 +8,10 @@ public class RedoState {
 
     private Mode mode = Mode.NONE;
 
-    // PDF redo data
     private File pdfFile;
     private int pdfPage;
     private double normX, normY, normW, normH;
 
-    // Screenshot redo
     private java.awt.image.BufferedImage screenshotImage;
 
     public void savePDFSelection(File file, int page,
@@ -48,13 +46,5 @@ public class RedoState {
     public void saveScreenshot(java.awt.image.BufferedImage img) {
         mode = Mode.SCREENSHOT;
         this.screenshotImage = img;
-    }
-
-    public boolean hasScreenshot() {
-        return mode == Mode.SCREENSHOT && screenshotImage != null;
-    }
-
-    public java.awt.image.BufferedImage getScreenshotImage() {
-        return screenshotImage;
     }
 }

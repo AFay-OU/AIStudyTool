@@ -47,7 +47,7 @@ public class PDFViewController {
     private static final float RENDER_DPI = 140f;
 
     public void initialize() {
-        setupSelection();
+        dragOverlay();
 
         scrollPane.setPannable(true);
         scrollPane.setFitToWidth(false);
@@ -123,7 +123,7 @@ public class PDFViewController {
         }
     }
 
-    private void setupSelection() {
+    private void dragOverlay() {
         overlayPane.setMouseTransparent(true);
         overlayPane.setCursor(Cursor.OPEN_HAND);
 
@@ -210,7 +210,7 @@ public class PDFViewController {
     @FXML
     private void onConfirm() {
         try {
-            String extracted = extractHighlightedText();
+            String extracted = extractText();
 
             if (extracted == null || extracted.isBlank()) {
                 showError("No text found in the selection.");
@@ -306,7 +306,7 @@ public class PDFViewController {
         stage.close();
     }
 
-    private String extractHighlightedText() throws Exception {
+    private String extractText() throws Exception {
         if (selectionRect == null)
             throw new IllegalStateException("No selected region.");
 

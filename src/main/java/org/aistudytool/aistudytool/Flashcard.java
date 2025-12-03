@@ -6,6 +6,7 @@ public class Flashcard {
     private String category = "General";
     private long nextReview;
     private int box = 1;
+    private boolean seen = false;
 
 
     public Flashcard(String question, String answer) {
@@ -52,5 +53,12 @@ public class Flashcard {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public boolean isSeen() {
+        return seen;
+    }
+    public void setSeen() {
+        this.seen = true;
     }
 }

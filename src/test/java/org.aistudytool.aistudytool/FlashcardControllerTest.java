@@ -22,7 +22,7 @@ public class FlashcardControllerTest {
 
         assertEquals(1, deck.getFlashcards().size(),
                 "Deck should contain 1 flashcard after adding.");
-        assertEquals("Q1", deck.getFlashcards().get(0).getQuestion());
+        assertEquals("Q1", deck.getFlashcards().getFirst().getQuestion());
     }
 
     @Test
@@ -76,7 +76,7 @@ public class FlashcardControllerTest {
         List<Flashcard> due = deck.dueCards();
 
         assertEquals(1, due.size(), "Only one card should be due.");
-        assertEquals("Due?", due.get(0).getQuestion());
+        assertEquals("Due?", due.getFirst().getQuestion());
     }
 
     @Test

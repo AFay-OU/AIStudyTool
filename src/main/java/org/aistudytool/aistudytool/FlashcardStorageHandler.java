@@ -10,7 +10,6 @@ import java.util.List;
 public class FlashcardStorageHandler {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
     private static final String DEFAULT_FILE = "flashcards.json";
 
     public static void autoInit() {
@@ -23,7 +22,13 @@ public class FlashcardStorageHandler {
             }
         } else {
             DeckHandler.getDecks().clear();
-            DeckHandler.addDeck(new Deck("Default Deck"));
+
+            FlashcardController defaultDeck = new FlashcardController();
+            defaultDeck.setName("Default Deck");
+
+            DeckHandler.addDeck(defaultDeck);
+            DeckHandler.setActiveDeck(defaultDeck);
+
             try {
                 saveAllDecks(DEFAULT_FILE);
             } catch (IOException e) {
@@ -33,15 +38,12 @@ public class FlashcardStorageHandler {
     }
 
     public static boolean deleteDeck(String deckName) {
-        List<Deck> decks = DeckHandler.getDecks();
+        List<FlashcardController> decks = DeckHandler.getDecks();
 
-        Deck toRemove = null;
-        for (Deck d : decks) {
-            if (d.getName().equals(deckName)) {
-                toRemove = d;
-                break;
-            }
-        }
+        FlashcardController toRemove = decks.stream()
+                .filter(d -> d.getName().equals(deckName))
+                .findFirst()
+                .orElse(null);
 
         if (toRemove == null)
             return false;
@@ -50,9 +52,10 @@ public class FlashcardStorageHandler {
 
         if (DeckHandler.getActiveDeck() == toRemove) {
             if (!decks.isEmpty()) {
-                DeckHandler.setActiveDeck(decks.get(0));
+                DeckHandler.setActiveDeck(decks.getFirst());
             } else {
-                Deck fresh = new Deck("Default Deck");
+                FlashcardController fresh = new FlashcardController();
+                fresh.setName("Default Deck");
                 decks.add(fresh);
                 DeckHandler.setActiveDeck(fresh);
             }
@@ -62,10 +65,8 @@ public class FlashcardStorageHandler {
         return true;
     }
 
-
-
     public static void saveAllDecks(String filename) throws IOException {
-        List<Deck> decks = DeckHandler.getDecks();
+        List<FlashcardController> decks = DeckHandler.getDecks();
 
         try (FileWriter fw = new FileWriter(filename)) {
             gson.toJson(decks, fw);
@@ -74,21 +75,21 @@ public class FlashcardStorageHandler {
 
     public static void loadAllDecks(String filename) throws IOException {
         try (FileReader fr = new FileReader(filename)) {
-            Deck[] loaded = gson.fromJson(fr, Deck[].class);
+
+            FlashcardController[] loaded = gson.fromJson(fr, FlashcardController[].class);
 
             DeckHandler.getDecks().clear();
             DeckHandler.getDecks().addAll(Arrays.asList(loaded));
 
             if (!DeckHandler.getDecks().isEmpty()) {
-                DeckHandler.setActiveDeck(DeckHandler.getDecks().get(0));
+                DeckHandler.setActiveDeck(DeckHandler.getDecks().getFirst());
             }
         }
     }
 
     public static void autoSave() {
         try {
-            saveAllDecks("flashcards.json");
+            saveAllDecks(DEFAULT_FILE);
         } catch (Exception ignored) {}
     }
-
 }

@@ -68,12 +68,10 @@ public class AIPreviewController {
         return dialog.showAndWait().orElse(defaultValue);
     }
 
-
     private void chooseDeckForFlashcard() {
-        // Fetch deck names
         var deckNames = DeckHandler.getDecks()
                 .stream()
-                .map(Deck::getName)
+                .map(FlashcardController::getName)
                 .toList();
 
         if (deckNames.isEmpty()) {
@@ -82,13 +80,14 @@ public class AIPreviewController {
             return;
         }
 
-        ChoiceDialog<String> dialog = new ChoiceDialog<>(deckNames.get(0), deckNames);
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(deckNames.getFirst(), deckNames);
         dialog.setTitle("Choose Deck");
         dialog.setHeaderText("Add flashcard to which deck?");
         dialog.setContentText("Deck:");
 
         dialog.showAndWait().ifPresent(selectedName -> {
-            Deck selectedDeck = DeckHandler.getDecks()
+
+            FlashcardController selectedDeck = DeckHandler.getDecks()
                     .stream()
                     .filter(d -> d.getName().equals(selectedName))
                     .findFirst()
@@ -103,5 +102,4 @@ public class AIPreviewController {
             closeWindow();
         });
     }
-
 }

@@ -46,9 +46,7 @@ public class LlamaLLM {
                 }
 
                 Object responseObj = cls.getMethod("getResponse").invoke(msgObj);
-                if (responseObj != null) {
-                    sb.append(responseObj.toString());
-                }
+                if (responseObj != null) sb.append(responseObj);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -56,15 +54,6 @@ public class LlamaLLM {
         }
 
         return sb.toString().trim();
-    }
-
-
-    private String tryMethod(Object obj, String methodName) {
-        try {
-            return (String) obj.getClass().getMethod(methodName).invoke(obj);
-        } catch (Exception e) {
-            return null;
-        }
     }
 
     public Flashcard generateFlashcard(String sourceText) throws OllamaException {

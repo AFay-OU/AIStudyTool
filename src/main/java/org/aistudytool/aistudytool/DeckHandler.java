@@ -5,54 +5,40 @@ import java.util.List;
 
 public class DeckHandler {
 
-    private static List<Deck> decks = new ArrayList<>();
-    private static Deck activeDeck = null;
+    private static final List<FlashcardController> decks = new ArrayList<>();
+    private static FlashcardController activeDeck = null;
 
-    public static void addDeck(Deck deck) {
+    public static void addDeck(FlashcardController deck) {
         decks.add(deck);
         if (activeDeck == null) activeDeck = deck;
     }
 
-    public static List<Deck> getDecks() {
+    public static List<FlashcardController> getDecks() {
         return decks;
     }
 
-    public static Deck getActiveDeck() {
+    public static FlashcardController getActiveDeck() {
         return activeDeck;
     }
 
-    public static void setActiveDeck(Deck deck) {
+    public static void setActiveDeck(FlashcardController deck) {
         activeDeck = deck;
     }
 
     public static List<String> getDeckNames() {
         List<String> names = new ArrayList<>();
-        for (Deck d : decks) {
+        for (FlashcardController d : decks) {
             names.add(d.getName());
         }
         return names;
     }
 
-    public static Deck getDeckByName(String name) {
-        for (Deck d : decks) {
+    public static FlashcardController getDeckByName(String name) {
+        for (FlashcardController d : decks) {
             if (d.getName().equals(name)) {
                 return d;
             }
         }
         return null;
-    }
-
-    public static boolean removeDeck(String name) {
-        return DeckHandler.getDecks().removeIf(d -> d.getName().equals(name));
-    }
-
-    public static int countDueCards(Deck deck) {
-        if (deck == null) return 0;
-
-        long now = System.currentTimeMillis();
-
-        return (int) deck.getCards().stream()
-                .filter(c -> c.getNextReview() <= now)
-                .count();
     }
 }

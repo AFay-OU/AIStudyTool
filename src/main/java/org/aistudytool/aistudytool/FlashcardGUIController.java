@@ -6,7 +6,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -30,11 +29,7 @@ public class FlashcardGUIController {
     @FXML private VBox aiPreviewBox;
     @FXML private Label aiQuestionLabel;
     @FXML private Label aiAnswerLabel;
-    @FXML private Button addToDeckButton;
-    @FXML private Button retryButton;
-    @FXML private Button editButton;
-    @FXML private Button cancelPreviewButton;
-    @FXML private StackPane centerStack;
+
 
     private Flashcard currentCard;
     private Flashcard aiGeneratedCard;
@@ -61,12 +56,12 @@ public class FlashcardGUIController {
 
         deckSummaryList.getItems().clear();
 
-        for (Deck d : DeckHandler.getDecks()) {
+        for (FlashcardController fc : DeckHandler.getDecks()) {
             deckSummaryList.getItems().add(
-                    d.getName()
-                            + " — " + d.getDueCards() + " due"
-                            + " | " + d.getTotalCards() + " total"
-                            + " | " + d.getNewCards() + " new"
+                    fc.getName()
+                            + " — " + fc.getDueCards() + " due"
+                            + " | " + fc.getTotalCards() + " total"
+                            + " | " + fc.getNewCards() + " new"
             );
         }
     }
@@ -84,7 +79,7 @@ public class FlashcardGUIController {
         int index = deckSummaryList.getSelectionModel().getSelectedIndex();
         if (index < 0) return;
 
-        Deck selected = DeckHandler.getDecks().get(index);
+        FlashcardController selected = DeckHandler.getDecks().get(index);
         DeckHandler.setActiveDeck(selected);
 
         if (selected.getTotalCards() == 0) {
@@ -92,7 +87,7 @@ public class FlashcardGUIController {
             return;
         }
 
-        List<Flashcard> due = selected.getCards().stream()
+        List<Flashcard> due = selected.getFlashcards().stream()
                 .filter(c -> c.getNextReview() <= System.currentTimeMillis())
                 .toList();
 
@@ -110,7 +105,7 @@ public class FlashcardGUIController {
         flashcardPanel.setManaged(true);
 
         switchHomeToShowAnswerMode();
-        displayCard(due.get(0));
+        displayCard(due.getFirst());
     }
 
     @FXML
@@ -135,10 +130,10 @@ public class FlashcardGUIController {
 
         flashcardList.getItems().clear();
 
-        Deck active = DeckHandler.getActiveDeck();
+        FlashcardController active = DeckHandler.getActiveDeck();
         if (active == null) return;
 
-        for (Flashcard c : active.getCards()) {
+        for (Flashcard c : active.getFlashcards()) {
             flashcardList.getItems().add("[" + c.getCategory() + "] " + c.getQuestion());
         }
     }
@@ -202,10 +197,10 @@ public class FlashcardGUIController {
 
     @FXML
     public void onReview() {
-        Deck active = DeckHandler.getActiveDeck();
+        FlashcardController active = DeckHandler.getActiveDeck();
         if (active == null) return;
 
-        List<Flashcard> due = active.getCards().stream()
+        List<Flashcard> due = active.getFlashcards().stream()
                 .filter(c -> c.getNextReview() <= System.currentTimeMillis())
                 .toList();
 
@@ -218,22 +213,22 @@ public class FlashcardGUIController {
         }
 
         switchHomeToShowAnswerMode();
-        displayCard(due.get(0));
+        displayCard(due.getFirst());
     }
 
     @FXML
     public void onReviewAllCards() {
-        List<Deck> decks = DeckHandler.getDecks();
+        List<FlashcardController> decks = DeckHandler.getDecks();
         if (decks.isEmpty()) {
             showError("No decks exist.");
             return;
         }
 
-        ChoiceDialog<Deck> dialog = new ChoiceDialog<>(DeckHandler.getActiveDeck(), decks);
+        ChoiceDialog<FlashcardController> dialog = new ChoiceDialog<>(DeckHandler.getActiveDeck(), decks);
         dialog.setHeaderText("Choose a Deck to Review");
         dialog.setContentText("Select a deck:");
 
-        Deck selectedDeck = dialog.showAndWait().orElse(null);
+        FlashcardController selectedDeck = dialog.showAndWait().orElse(null);
         if (selectedDeck == null) return;
 
         if (selectedDeck.getTotalCards() == 0) {
@@ -248,8 +243,8 @@ public class FlashcardGUIController {
     private int reviewAllIndex = 0;
     private boolean inFullReviewMode = false;
 
-    private void startFullReviewMode(Deck deck) {
-        reviewAllList = deck.getCards();
+    private void startFullReviewMode(FlashcardController deck) {
+        reviewAllList = deck.getFlashcards();
         reviewAllIndex = 0;
         inFullReviewMode = true;
 
@@ -290,7 +285,7 @@ public class FlashcardGUIController {
         wrongButton.setDisable(false);
 
         showAnswerButton.setText("Show Answer");
-        showAnswerButton.setOnAction(e -> onShowAnswer());
+        showAnswerButton.setOnAction(_ -> onShowAnswer());
     }
 
     private void endFullReviewMode() {
@@ -307,14 +302,14 @@ public class FlashcardGUIController {
 
     private void switchShowAnswerToHomeMode() {
         showAnswerButton.setText("Home");
-        showAnswerButton.setOnAction(e -> onHome());
+        showAnswerButton.setOnAction(_ -> onHome());
         correctButton.setDisable(true);
         wrongButton.setDisable(true);
     }
 
     private void switchHomeToShowAnswerMode() {
         showAnswerButton.setText("Show Answer");
-        showAnswerButton.setOnAction(e -> onShowAnswer());
+        showAnswerButton.setOnAction(_ -> onShowAnswer());
         correctButton.setDisable(true);
         wrongButton.setDisable(true);
     }
@@ -335,7 +330,7 @@ public class FlashcardGUIController {
 
         Flashcard card = new Flashcard(q, a);
 
-        Deck chosenDeck = chooseDeckForNewCard();
+        FlashcardController chosenDeck = chooseDeckForNewCard();
         if (chosenDeck == null) return;
 
         chosenDeck.addCard(card);
@@ -348,10 +343,10 @@ public class FlashcardGUIController {
         showDeckListView();
     }
 
-    private Deck chooseDeckForNewCard() {
-        List<Deck> decks = DeckHandler.getDecks();
+    private FlashcardController chooseDeckForNewCard() {
+        List<FlashcardController> decks = DeckHandler.getDecks();
 
-        ChoiceDialog<Deck> dialog =
+        ChoiceDialog<FlashcardController> dialog =
                 new ChoiceDialog<>(DeckHandler.getActiveDeck(), decks);
 
         dialog.setHeaderText("Choose Deck");
@@ -369,7 +364,10 @@ public class FlashcardGUIController {
         String name = dialog.showAndWait().orElse(null);
         if (name == null || name.trim().isEmpty()) return;
 
-        Deck deck = new Deck(name.trim());
+        // Create a new FlashcardController (a deck)
+        FlashcardController deck = new FlashcardController();
+        deck.setName(name.trim());
+
         DeckHandler.addDeck(deck);
         DeckHandler.setActiveDeck(deck);
 
@@ -380,6 +378,7 @@ public class FlashcardGUIController {
 
         showInfo("Created new deck: " + name);
     }
+
 
     @FXML
     public void onSaveAllDecks() {
@@ -416,18 +415,18 @@ public class FlashcardGUIController {
 
     @FXML
     public void onEditFlashcards() {
-        List<Deck> decks = DeckHandler.getDecks();
+        List<FlashcardController> decks = DeckHandler.getDecks();
 
         if (decks.isEmpty()) {
             showError("No decks exist.");
             return;
         }
 
-        ChoiceDialog<Deck> dialog = new ChoiceDialog<>(DeckHandler.getActiveDeck(), decks);
+        ChoiceDialog<FlashcardController> dialog = new ChoiceDialog<>(DeckHandler.getActiveDeck(), decks);
         dialog.setHeaderText("Choose a Deck to Edit");
         dialog.setContentText("Select a deck:");
 
-        Deck chosenDeck = dialog.showAndWait().orElse(null);
+        FlashcardController chosenDeck = dialog.showAndWait().orElse(null);
         if (chosenDeck == null) return;
 
         if (chosenDeck.getTotalCards() == 0) {
@@ -440,7 +439,7 @@ public class FlashcardGUIController {
 
     @FXML
     private void deleteDeck() {
-        List<Deck> decks = DeckHandler.getDecks();
+        List<FlashcardController> decks = DeckHandler.getDecks();
 
         if (decks.isEmpty()) {
             showError("There are no decks to delete.");
@@ -451,7 +450,7 @@ public class FlashcardGUIController {
         List<String> deckNames = DeckHandler.getDeckNames();
 
         ChoiceDialog<String> dialog = new ChoiceDialog<>(
-                DeckHandler.getActiveDeck() != null ? DeckHandler.getActiveDeck().getName() : deckNames.get(0),
+                DeckHandler.getActiveDeck() != null ? DeckHandler.getActiveDeck().getName() : deckNames.getFirst(),
                 deckNames
         );
 
@@ -483,20 +482,10 @@ public class FlashcardGUIController {
         refreshDeckDisplay();
     }
 
-
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-
     private void refreshDeckDisplay() {
         refreshDeckSummaryList();
 
-        Deck active = DeckHandler.getActiveDeck();
+        FlashcardController active = DeckHandler.getActiveDeck();
         if (active != null) {
             updateTopLabelStats(active);
             refreshList();
@@ -513,7 +502,7 @@ public class FlashcardGUIController {
 
 
 
-    private void openFlashcardEditor(Deck deck) {
+    private void openFlashcardEditor(FlashcardController deck) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("FlashcardEditor.fxml"));
             Parent root = loader.load();
@@ -541,7 +530,7 @@ public class FlashcardGUIController {
             popup.setTitle("Edit Flashcards — " + deck.getName());
             popup.setScene(new Scene(root));
 
-            popup.setOnHidden(e -> refresh.run());
+            popup.setOnHidden(_ -> refresh.run());
 
             popup.show();
 
@@ -611,7 +600,7 @@ public class FlashcardGUIController {
             ExtractedTextDialogController controller = loader.getController();
             controller.setInitialText(rawText);
 
-            controller.setOnConfirm(finalText -> createFlashcardsFromExtractedText(finalText));
+            controller.setOnConfirm(this::createFlashcardsFromExtractedText);
             controller.setOnRetry(() -> Platform.runLater(this::retryLastExtraction));
 
             Stage stage = new Stage();
@@ -639,38 +628,6 @@ public class FlashcardGUIController {
         }
         startScreenshotMode();
     }
-
-    private void redoScreenshot() {
-        startScreenshotMode();
-    }
-
-    @FXML
-    private void onRedo() {
-        RedoState redo = AppState.getRedoState();
-
-        System.out.println("Redo PDF: " + redo.hasPDF());
-        System.out.println("Redo Screenshot: " + redo.hasScreenshot());
-
-        if (redo.hasPDF()) {
-            openPDFWithRestore(
-                    redo.getPdfFile(),
-                    redo.getPdfPage(),
-                    redo.getNormX(),
-                    redo.getNormY(),
-                    redo.getNormW(),
-                    redo.getNormH()
-            );
-            return;
-        }
-
-        if (redo.hasScreenshot()) {
-            redoScreenshot();
-            return;
-        }
-
-        showError("Nothing to redo.");
-    }
-
 
     private void openPDFWithRestore(File file, int page,
                                     double nx, double ny,
@@ -758,7 +715,7 @@ public class FlashcardGUIController {
     }
 
 
-    private void updateTopLabelStats(Deck deck) {
+    private void updateTopLabelStats(FlashcardController deck) {
         if (deck == null) return;
 
         int due = deck.getDueCards();
@@ -793,7 +750,7 @@ public class FlashcardGUIController {
         dialog.setContentText("Add flashcard to:");
 
         dialog.showAndWait().ifPresent(deckName -> {
-            Deck deck = DeckHandler.getDeckByName(deckName);
+            FlashcardController deck = DeckHandler.getDeckByName(deckName);
             assert deck != null;
             deck.addCard(aiGeneratedCard);
 

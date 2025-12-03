@@ -10,22 +10,22 @@ public class FlashcardEditorController {
     @FXML private TextArea questionArea;
     @FXML private TextArea answerArea;
 
-    private Deck deck;
+    private FlashcardController deck;
     private Flashcard selectedCard;
     private Runnable onCloseCallback;
 
 
-    public void setDeck(Deck deck) {
+    public void setDeck(FlashcardController deck) {
         this.deck = deck;
 
         flashcardListView.getItems().clear();
-        for (Flashcard card : deck.getCards()) {
+        for (Flashcard card : deck.getFlashcards()) {
             flashcardListView.getItems().add(card.getQuestion());
         }
 
-        flashcardListView.getSelectionModel().selectedIndexProperty().addListener((obs, old, index) -> {
+        flashcardListView.getSelectionModel().selectedIndexProperty().addListener((_, _, index) -> {
             if (index.intValue() < 0) return;
-            selectedCard = deck.getCards().get(index.intValue());
+            selectedCard = deck.getFlashcards().get(index.intValue());
             questionArea.setText(selectedCard.getQuestion());
             answerArea.setText(selectedCard.getAnswer());
         });
@@ -38,7 +38,7 @@ public class FlashcardEditorController {
         selectedCard.setQuestion(questionArea.getText());
         selectedCard.setAnswer(answerArea.getText());
 
-        int i = deck.getCards().indexOf(selectedCard);
+        int i = deck.getFlashcards().indexOf(selectedCard);
         flashcardListView.getItems().set(i, selectedCard.getQuestion());
 
         FlashcardStorageHandler.autoSave();
@@ -61,9 +61,9 @@ public class FlashcardEditorController {
             return;
         }
 
-        int index = deck.getCards().indexOf(selectedCard);
+        int index = deck.getFlashcards().indexOf(selectedCard);
 
-        deck.getCards().remove(selectedCard);
+        deck.getFlashcards().remove(selectedCard);
 
         flashcardListView.getItems().remove(index);
 
@@ -73,7 +73,7 @@ public class FlashcardEditorController {
         answerArea.clear();
         selectedCard = null;
 
-        if (deck.getCards().isEmpty()) {
+        if (deck.getFlashcards().isEmpty()) {
             Alert a = new Alert(Alert.AlertType.INFORMATION, "No flashcards remain in this deck.");
             a.showAndWait();
             close();
