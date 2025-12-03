@@ -18,6 +18,7 @@
 
                 <Button text="Prev" onAction="#onPrevPage"/>
                 <Button text="Next" onAction="#onNextPage"/>
+                <Button text="Go to Page" onAction="#onGoToPage"/>
 
                 <Button text="Zoom -" onAction="#onZoomOut"/>
                 <Button text="Zoom +" onAction="#onZoomIn"/>

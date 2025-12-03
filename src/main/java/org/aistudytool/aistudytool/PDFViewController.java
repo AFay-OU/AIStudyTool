@@ -216,6 +216,38 @@ public class PDFViewController {
     }
 
     @FXML
+    private void onGoToPage() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Go to Page");
+        dialog.setHeaderText(null);
+        dialog.setContentText("Enter page number:");
+
+        dialog.getEditor().textProperty().addListener((_, _, newV) -> {
+            if (!newV.matches("\\d*")) {
+                dialog.getEditor().setText(newV.replaceAll("\\D", ""));
+            }
+        });
+
+        dialog.showAndWait().ifPresent(input -> {
+            if (input.isBlank()) return;
+
+            try {
+                int pageNum = Integer.parseInt(input.trim());
+                int max = document.getNumberOfPages();
+
+                if (pageNum < 1 || pageNum > max) {
+                    showError("Page must be between 1 and " + max);
+                    return;
+                }
+
+                displayPage(pageNum - 1);
+            } catch (Exception e) {
+                showError("Invalid page number.");
+            }
+        });
+    }
+
+    @FXML
     private void onCancel() {
         closeWindow();
         if (onCancelCallback != null) onCancelCallback.run();

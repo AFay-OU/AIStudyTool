@@ -19,10 +19,10 @@
     </Label>
 
     <Label text="Question:" style="-fx-font-weight: bold;"/>
-    <TextArea fx:id="questionArea" wrapText="true"/>
+    <TextArea fx:id="questionArea" wrapText="true" prefHeight="80"/>
 
     <Label text="Answer:" style="-fx-font-weight: bold;"/>
-    <TextArea fx:id="answerArea" wrapText="true"/>
+    <TextArea fx:id="answerArea" wrapText="true" prefHeight="120"/>
 
     <HBox spacing="10" alignment="CENTER">
         <Button fx:id="addButton" text="Add to Deck" onAction="#onAdd"/>

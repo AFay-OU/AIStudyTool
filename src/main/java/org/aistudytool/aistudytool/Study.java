@@ -71,15 +71,16 @@ public class Study {
         return hours + "h " + minutes + "m";
     }
 
-    private  static void updateNextReview(Flashcard card){
+    private static void updateNextReview(Flashcard card){
         int box = card.getBox();
         int days = intervals[box];
 
         LocalDate nextDate = LocalDate.now().plusDays(days);
-        long timestamp = nextDate.atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000;
+        long timestamp = nextDate
+                .atStartOfDay(ZoneId.systemDefault())
+                .toInstant()
+                .toEpochMilli();
 
         card.setNextReview(timestamp);
-        String timeStr = Study.getTimeUntilReview(card);
-        System.out.println("Next review: " + timeStr);
     }
 }

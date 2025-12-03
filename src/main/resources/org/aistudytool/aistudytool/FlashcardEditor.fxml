@@ -19,7 +19,7 @@
         </Label>
 
 
-            <ListView fx:id="flashcardListView" prefWidth="200" />
+            <ListView fx:id="flashcardListView" prefWidth="100" prefHeight="250"/>
         </VBox>
     </left>
 

@@ -14,6 +14,7 @@ public class StudyTest {
     @BeforeEach
     public void setup() {
         card = new Flashcard("Q1", "A2");
+        card.setSeen();
         card.setNextReview(0);
         card.setBox(1);
     }

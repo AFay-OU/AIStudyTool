@@ -547,7 +547,6 @@ public class FlashcardGUIController {
             popup.setScene(new Scene(root));
 
             popup.setOnHidden(_ -> refresh.run());
-
             popup.sizeToScene();
             popup.setResizable(false);
             popup.show();
@@ -716,11 +715,13 @@ public class FlashcardGUIController {
                 }
             });
 
-
-            Stage popup = new Stage();
-            popup.setTitle("AI Flashcard Preview");
-            popup.setScene(new Scene(root));
-            popup.show();
+            Stage stage = new Stage();
+            stage.setTitle("AI Flashcard Preview");
+            stage.setScene(new Scene(root));
+            stage.setMinHeight(300);
+            stage.setHeight(350);
+            stage.setResizable(true);
+            stage.show();
 
         } catch (Exception e) {
             e.printStackTrace();
