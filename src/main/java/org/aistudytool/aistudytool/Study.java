@@ -11,29 +11,46 @@ public class Study {
       0, 1, 2, 5, 10, 30
     };
 
-    public static void markCorrect(Flashcard card){
-        card.setSeen();
+    public static void markCorrect(Flashcard card) {
+
         int box = card.getBox();
-        if (box == 1) {
-            card.setNextReview(
-                    System.currentTimeMillis() + 24L * 60L * 60L * 1000L
-            );
-            System.out.println("Next review: 24h (still learning)");
+
+        if (box == 1 && !card.isSeen()) {
+            card.setSeen();
+
+            long tomorrowStart = java.time.LocalDate.now()
+                    .plusDays(1)
+                    .atStartOfDay(java.time.ZoneId.systemDefault())
+                    .toEpochSecond() * 1000;
+
+            card.setNextReview(tomorrowStart);
+            System.out.println("Next review: Tomorrow (start of day)");
             return;
         }
+
+        if (box == 1 && card.isSeen()) {
+            card.setBox(2);
+            updateNextReview(card);
+            System.out.println("Promoted to box 2");
+            return;
+        }
+
+        card.setSeen();
         if (box < 5) {
             card.setBox(box + 1);
         }
-
         updateNextReview(card);
     }
 
-    public static void markIncorrect(Flashcard card){
-        if (!card.isSeen()) {
-            card.setSeen();
-        }
+    public static void markIncorrect(Flashcard card) {
 
-        card.setBox(1);
+        int box = card.getBox();
+
+        if (box > 1) {
+            card.setBox(box - 1);
+        } else {
+            card.setBox(1);
+        }
 
         card.setNextReview(System.currentTimeMillis());
         System.out.println("Next review: Due immediately");

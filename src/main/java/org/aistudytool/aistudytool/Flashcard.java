@@ -58,7 +58,9 @@ public class Flashcard {
     public boolean isSeen() {
         return seen;
     }
+
     public void setSeen() {
         this.seen = true;
     }
+
 }

@@ -16,18 +16,15 @@
                     <Insets top="10" right="10" bottom="5" left="10"/>
                 </padding>
 
-                <!-- Page navigation -->
                 <Button text="Prev" onAction="#onPrevPage"/>
                 <Button text="Next" onAction="#onNextPage"/>
 
-                <!-- Zoom -->
                 <Button text="Zoom -" onAction="#onZoomOut"/>
                 <Button text="Zoom +" onAction="#onZoomIn"/>
                 <Button text="Reset" onAction="#onZoomReset"/>
 
-                <!-- Mode toggle -->
                 <ToggleButton fx:id="selectModeToggle"
-                              text="Select Mode"
+                              text="Highlight"
                               onAction="#onToggleSelectMode"/>
 
                 <Button text="Confirm" onAction="#onConfirm"/>
@@ -41,15 +38,12 @@
 
     <center>
         <ScrollPane fx:id="scrollPane" pannable="true">
-            <content>
-                <StackPane fx:id="pdfContainer">
-                    <ImageView fx:id="pdfImageView"
-                               preserveRatio="true"
-                               smooth="true"/>
-                    <!-- Transparent overlay for highlight -->
-                    <Pane fx:id="overlayPane" pickOnBounds="true" />
-                </StackPane>
-            </content>
+            <StackPane fx:id="pdfContainer">
+                <ImageView fx:id="pdfImageView"
+                           preserveRatio="true"
+                />
+                <Pane fx:id="overlayPane"/>
+            </StackPane>
         </ScrollPane>
     </center>
 

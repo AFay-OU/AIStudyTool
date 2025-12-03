@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 
 public class FlashcardGUIController {
@@ -92,9 +93,21 @@ public class FlashcardGUIController {
                 .toList();
 
         if (due.isEmpty()) {
-            showInfo("No cards are due in this deck.");
+            Flashcard next = selected.getFlashcards().stream()
+                    .filter(c -> c.getNextReview() > System.currentTimeMillis())
+                    .min(Comparator.comparingLong(Flashcard::getNextReview))
+                    .orElse(null);
+
+            String msg = "No cards are due in this deck.";
+
+            if (next != null) {
+                msg += "\n\nNext card is due in: " + Study.getTimeUntilReview(next);
+            }
+
+            showInfo(msg);
             return;
         }
+
 
         updateTopLabelStats(selected);
 
@@ -205,7 +218,7 @@ public class FlashcardGUIController {
                 .toList();
 
         if (due.isEmpty()) {
-            questionLabel.setText("No cards are due today.");
+            questionLabel.setText("No cards are due in this deck.");
             answerLabel.setVisible(false);
 
             switchShowAnswerToHomeMode();
@@ -277,7 +290,6 @@ public class FlashcardGUIController {
         answerLabel.setText(card.getAnswer());
         answerLabel.setVisible(false);
 
-        // Disable spaced repetition buttons but show them
         correctButton.setText("Next");
         wrongButton.setText("Back");
 
@@ -290,8 +302,6 @@ public class FlashcardGUIController {
 
     private void endFullReviewMode() {
         inFullReviewMode = false;
-
-        // Reset button text
         correctButton.setText("Correct");
         wrongButton.setText("Wrong");
 
@@ -364,7 +374,6 @@ public class FlashcardGUIController {
         String name = dialog.showAndWait().orElse(null);
         if (name == null || name.trim().isEmpty()) return;
 
-        // Create a new FlashcardController (a deck)
         FlashcardController deck = new FlashcardController();
         deck.setName(name.trim());
 
@@ -446,7 +455,6 @@ public class FlashcardGUIController {
             return;
         }
 
-        // Convert deck list to names for the drop-down list
         List<String> deckNames = DeckHandler.getDeckNames();
 
         ChoiceDialog<String> dialog = new ChoiceDialog<>(
@@ -461,7 +469,6 @@ public class FlashcardGUIController {
         String chosen = dialog.showAndWait().orElse(null);
         if (chosen == null) return; // cancelled
 
-        // Confirm deletion
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirm Delete");
         confirm.setHeaderText("Delete Deck: " + chosen);
@@ -477,8 +484,6 @@ public class FlashcardGUIController {
             showError("Failed to delete deck.");
             return;
         }
-
-        // Refresh UI
         refreshDeckDisplay();
     }
 

@@ -77,7 +77,6 @@ public class PDFViewController {
         pageLabel.setText("Page " + (pageIndex + 1));
     }
 
-
     private void applyZoom() {
         Image img = pdfImageView.getImage();
         if (img == null) return;

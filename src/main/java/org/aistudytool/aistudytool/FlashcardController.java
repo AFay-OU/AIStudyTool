@@ -45,7 +45,7 @@ public class FlashcardController {
 
     public int getNewCards() {
         return (int) cards.stream()
-                .filter(c -> c.getBox() == 1)
+                .filter(c -> !c.isSeen())
                 .count();
     }
 
