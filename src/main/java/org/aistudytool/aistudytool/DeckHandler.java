@@ -32,13 +32,4 @@ public class DeckHandler {
         }
         return names;
     }
-
-    public static FlashcardController getDeckByName(String name) {
-        for (FlashcardController d : decks) {
-            if (d.getName().equals(name)) {
-                return d;
-            }
-        }
-        return null;
-    }
 }

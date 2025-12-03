@@ -110,23 +110,7 @@
                         <Button fx:id="wrongButton" text="Wrong" onAction="#onWrong"/>
                         <ToggleButton fx:id="flipModeToggle" text="Flip Q/A" onAction="#onFlipModeToggle"/>
                     </HBox>
-
                 </VBox>
-
-
-                <VBox fx:id="aiPreviewBox" visible="false" managed="false">
-                    <Label fx:id="aiQuestionLabel" text="Question will appear here"/>
-                    <Label fx:id="aiAnswerLabel" text="Answer will appear here"/>
-
-                    <HBox spacing="10">
-                        <Button fx:id="addToDeckButton" text="Add to Deck" onAction="#onAddToDeckButton"/>
-                        <Button fx:id="retryButton" text="Retry" onAction="#onRetryAICard"/>
-                        <Button fx:id="editButton" text="Edit" onAction="#onEditAICard"/>
-                        <Button fx:id="cancelPreviewButton" text="Cancel" onAction="#onCancelAIPreview"/>
-
-                    </HBox>
-                </VBox>
-
             </StackPane>
         </center>
 

@@ -18,10 +18,6 @@ import java.util.List;
 
 public class FlashcardGUIController {
 
-    @FXML Button retryButton;
-    @FXML Button editButton;
-    @FXML Button cancelPreviewButton;
-    @FXML Button addToDeckButton;
     @FXML StackPane centerStack;
     @FXML private VBox flashcardPanel;
     @FXML private Label questionLabel;
@@ -32,9 +28,7 @@ public class FlashcardGUIController {
     @FXML private ListView<String> deckSummaryList;
     @FXML private Label topTitleLabel;
     @FXML private Button showAnswerButton;
-    @FXML private VBox aiPreviewBox;
-    @FXML private Label aiQuestionLabel;
-    @FXML private Label aiAnswerLabel;
+
 
     private boolean flipMode = false;
     @FXML private ToggleButton flipModeToggle;
@@ -554,6 +548,8 @@ public class FlashcardGUIController {
 
             popup.setOnHidden(_ -> refresh.run());
 
+            popup.sizeToScene();
+            popup.setResizable(false);
             popup.show();
 
         } catch (Exception e) {
@@ -684,15 +680,13 @@ public class FlashcardGUIController {
 
             aiGeneratedCard = llm.generateFlashcard(confirmedText);
 
-            aiQuestionLabel.setText(aiGeneratedCard.getQuestion());
-            aiAnswerLabel.setText(aiGeneratedCard.getAnswer());
-
             showAIPreviewPopup();
 
         } catch (Exception e) {
             showError("AI Flashcard generation failed:\n" + e.getMessage());
         }
     }
+
 
 
     private void showAIPreviewPopup() {
@@ -757,73 +751,5 @@ public class FlashcardGUIController {
 
     private void showInfo(String msg) {
         new Alert(Alert.AlertType.INFORMATION, msg).show();
-    }
-
-    @FXML
-    private void onAddToDeckButton() {
-        if (aiGeneratedCard == null) return;
-
-        List<String> decks = DeckHandler.getDeckNames();
-
-        ChoiceDialog<String> dialog = new ChoiceDialog<>(DeckHandler.getActiveDeck().getName(), decks);
-        dialog.setHeaderText("Choose Deck");
-        dialog.setContentText("Add flashcard to:");
-
-        dialog.showAndWait().ifPresent(deckName -> {
-            FlashcardController deck = DeckHandler.getDeckByName(deckName);
-            assert deck != null;
-            deck.addCard(aiGeneratedCard);
-
-            showInfo("Added to " + deckName);
-            aiPreviewBox.setVisible(false);
-            aiPreviewBox.setManaged(false);
-
-            refreshDeckSummaryList();
-            updateTopLabelStats(deck);
-            autoSaveDecks();
-        });
-    }
-
-    @FXML
-    private void onRetryAICard() {
-        if (aiGeneratedCard == null) return;
-
-        try {
-            aiGeneratedCard = llm.generateFlashcard(
-                    aiQuestionLabel.getText() + "\n" + aiAnswerLabel.getText()
-            );
-
-            aiQuestionLabel.setText(aiGeneratedCard.getQuestion());
-            aiAnswerLabel.setText(aiGeneratedCard.getAnswer());
-
-        } catch (Exception e) {
-            showError("Retry failed: " + e.getMessage());
-        }
-    }
-
-    @FXML
-    private void onEditAICard() {
-        if (aiGeneratedCard == null) return;
-
-        TextInputDialog qDialog = new TextInputDialog(aiGeneratedCard.getQuestion());
-        qDialog.setHeaderText("Edit Question");
-        String newQ = qDialog.showAndWait().orElse(aiGeneratedCard.getQuestion());
-
-        TextInputDialog aDialog = new TextInputDialog(aiGeneratedCard.getAnswer());
-        aDialog.setHeaderText("Edit Answer");
-        String newA = aDialog.showAndWait().orElse(aiGeneratedCard.getAnswer());
-
-        aiGeneratedCard.setQuestion(newQ);
-        aiGeneratedCard.setAnswer(newA);
-
-        aiQuestionLabel.setText(newQ);
-        aiAnswerLabel.setText(newA);
-    }
-
-    @FXML
-    private void onCancelAIPreview() {
-        aiPreviewBox.setVisible(false);
-        aiPreviewBox.setManaged(false);
-        aiGeneratedCard = null;
     }
 }

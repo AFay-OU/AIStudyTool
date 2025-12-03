@@ -4,16 +4,21 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.*?>
 
+<?import javafx.scene.text.Font?>
 <BorderPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="org.aistudytool.aistudytool.FlashcardEditorController"
-            prefWidth="600" prefHeight="400">
+            fx:controller="org.aistudytool.aistudytool.FlashcardEditorController">
+
     <left>
         <VBox spacing="10">
             <padding>
                 <Insets top="10" right="10" bottom="5" left="10"/>
             </padding>
 
-            <Label text="Flashcards in Deck:"/>
+            <Label text="Flashcards in Deck:">
+            <font><Font name="Cambria Bold" size="20"/></font>
+        </Label>
+
+
             <ListView fx:id="flashcardListView" prefWidth="200" />
         </VBox>
     </left>

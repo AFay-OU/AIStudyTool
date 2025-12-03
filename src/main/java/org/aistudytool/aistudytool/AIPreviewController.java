@@ -1,12 +1,16 @@
 package org.aistudytool.aistudytool;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
 
 public class AIPreviewController {
 
+    @FXML public Button addButton;
+    @FXML public Button retryButton;
+    @FXML public Button cancelButton;
     @FXML private TextArea questionArea;
     @FXML private TextArea answerArea;
 
@@ -20,31 +24,22 @@ public class AIPreviewController {
         answerArea.setText(card.getAnswer());
     }
 
-    public void setOnAddCallback(Runnable callback) {
-        this.onAddCallback = callback;
-    }
-
-    public void setOnRetryCallback(Runnable callback) {
-        this.onRetryCallback = callback;
-    }
+    public void setOnAddCallback(Runnable r) { this.onAddCallback = r; }
+    public void setOnRetryCallback(Runnable r) { this.onRetryCallback = r; }
 
     @FXML
     private void onAdd() {
+        if (flashcard != null) {
+            flashcard.setQuestion(questionArea.getText());
+            flashcard.setAnswer(answerArea.getText());
+        }
+
         chooseDeckForFlashcard();
     }
 
     @FXML
     private void onRetry() {
         if (onRetryCallback != null) onRetryCallback.run();
-    }
-
-    @FXML
-    private void onEdit() {
-        flashcard.setQuestion(prompt("Edit Question:", flashcard.getQuestion()));
-        flashcard.setAnswer(prompt("Edit Answer:", flashcard.getAnswer()));
-
-        questionArea.setText(flashcard.getQuestion());
-        answerArea.setText(flashcard.getAnswer());
     }
 
     @FXML
@@ -61,11 +56,12 @@ public class AIPreviewController {
         return flashcard;
     }
 
-    private String prompt(String title, String defaultValue) {
-        var dialog = new javafx.scene.control.TextInputDialog(defaultValue);
-        dialog.setTitle(title);
-        dialog.setHeaderText(title);
-        return dialog.showAndWait().orElse(defaultValue);
+    public TextArea getQuestionArea() {
+        return questionArea;
+    }
+
+    public TextArea getAnswerArea() {
+        return answerArea;
     }
 
     private void chooseDeckForFlashcard() {
@@ -96,10 +92,12 @@ public class AIPreviewController {
             if (selectedDeck != null) {
                 selectedDeck.addCard(flashcard);
                 DeckHandler.setActiveDeck(selectedDeck);
+
+                if (onAddCallback != null) onAddCallback.run(); // <--- notify main controller
             }
 
-            if (onAddCallback != null) onAddCallback.run();
             closeWindow();
         });
     }
+
 }
