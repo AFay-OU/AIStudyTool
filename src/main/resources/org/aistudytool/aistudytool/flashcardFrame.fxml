@@ -4,7 +4,6 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.Font?>
-<?import java.lang.String?>
 
 
 <AnchorPane xmlns:fx="http://javafx.com/fxml"
@@ -17,12 +16,11 @@
             <StackPane prefHeight="160" BorderPane.alignment="CENTER">
                 <Path fill="#848a98" stroke="#848a98" strokeType="INSIDE">
                     <elements>
-                        <MoveTo x="0" y="0" />
+                        <MoveTo/>
                         <HLineTo x="800.0" />
                         <VLineTo y="60.0" />
                         <ArcTo radiusX="320.0"
                                radiusY="60.0"
-                               x="0"
                                y="60.0"
                                sweepFlag="true"/>
                     </elements>
@@ -106,9 +104,11 @@
                   -fx-text-alignment: center;"/>
 
                     <HBox alignment="CENTER" spacing="15">
+
                         <Button fx:id="showAnswerButton" text="Show Answer" onAction="#onShowAnswer"/>
                         <Button fx:id="correctButton" text="Correct" onAction="#onCorrect"/>
                         <Button fx:id="wrongButton" text="Wrong" onAction="#onWrong"/>
+                        <ToggleButton fx:id="flipModeToggle" text="Flip Q/A" onAction="#onFlipModeToggle"/>
                     </HBox>
 
                 </VBox>

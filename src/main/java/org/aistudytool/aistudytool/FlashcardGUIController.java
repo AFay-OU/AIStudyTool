@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -17,6 +18,11 @@ import java.util.List;
 
 public class FlashcardGUIController {
 
+    @FXML Button retryButton;
+    @FXML Button editButton;
+    @FXML Button cancelPreviewButton;
+    @FXML Button addToDeckButton;
+    @FXML StackPane centerStack;
     @FXML private VBox flashcardPanel;
     @FXML private Label questionLabel;
     @FXML private Label answerLabel;
@@ -29,6 +35,10 @@ public class FlashcardGUIController {
     @FXML private VBox aiPreviewBox;
     @FXML private Label aiQuestionLabel;
     @FXML private Label aiAnswerLabel;
+
+    private boolean flipMode = false;
+    @FXML private ToggleButton flipModeToggle;
+
 
     private Flashcard currentCard;
     private Flashcard aiGeneratedCard;
@@ -46,7 +56,8 @@ public class FlashcardGUIController {
         deckListPanel.setManaged(true);
         flashcardPanel.setVisible(false);
         flashcardPanel.setManaged(false);
-
+        flipModeToggle.setVisible(false);
+        flipModeToggle.setManaged(false);
     }
 
     private void refreshDeckSummaryList() {
@@ -113,6 +124,8 @@ public class FlashcardGUIController {
 
         flashcardPanel.setVisible(true);
         flashcardPanel.setManaged(true);
+        flipModeToggle.setVisible(false);
+        flipModeToggle.setManaged(false);
 
         switchHomeToShowAnswerMode();
         displayCard(due.getFirst());
@@ -131,6 +144,8 @@ public class FlashcardGUIController {
 
         flashcardPanel.setVisible(false);
         flashcardPanel.setManaged(false);
+        flipModeToggle.setVisible(false);
+        flipModeToggle.setManaged(false);
 
         refreshDeckSummaryList();
     }
@@ -211,6 +226,9 @@ public class FlashcardGUIController {
 
         switchHomeToShowAnswerMode();
         displayCard(due.getFirst());
+
+        flipModeToggle.setVisible(false);
+        flipModeToggle.setManaged(false);
     }
 
     @FXML
@@ -251,6 +269,10 @@ public class FlashcardGUIController {
         flashcardPanel.setVisible(true);
         flashcardPanel.setManaged(true);
 
+        flipModeToggle.setVisible(true);
+        flipModeToggle.setManaged(true);
+        flipModeToggle.setSelected(false);
+
         showCardInFullReview();
     }
 
@@ -270,8 +292,14 @@ public class FlashcardGUIController {
         Flashcard card = reviewAllList.get(reviewAllIndex);
         currentCard = card;
 
-        questionLabel.setText(card.getQuestion());
-        answerLabel.setText(card.getAnswer());
+        if (!flipMode) {
+            questionLabel.setText(card.getQuestion());
+            answerLabel.setText(card.getAnswer());
+        } else {
+            questionLabel.setText(card.getAnswer());
+            answerLabel.setText(card.getQuestion());
+        }
+
         answerLabel.setVisible(false);
 
         correctButton.setText("Next");
@@ -281,13 +309,25 @@ public class FlashcardGUIController {
         wrongButton.setDisable(false);
 
         showAnswerButton.setText("Show Answer");
-        showAnswerButton.setOnAction(_ -> onShowAnswer());
+        showAnswerButton.setOnAction(_ -> answerLabel.setVisible(true));
     }
+
+    @FXML
+    private void onFlipModeToggle() {
+        flipMode = flipModeToggle.isSelected();
+        showCardInFullReview();
+    }
+
+
 
     private void endFullReviewMode() {
         inFullReviewMode = false;
         correctButton.setText("Correct");
         wrongButton.setText("Wrong");
+
+        flipModeToggle.setVisible(false);
+        flipModeToggle.setManaged(false);
+        flipModeToggle.setSelected(false);
 
         showDeckListView();
     }
@@ -448,7 +488,7 @@ public class FlashcardGUIController {
         dialog.setContentText("Choose deck:");
 
         String chosen = dialog.showAndWait().orElse(null);
-        if (chosen == null) return; // cancelled
+        if (chosen == null) return;
 
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirm Delete");
@@ -623,7 +663,7 @@ public class FlashcardGUIController {
             controller.loadPDF(file);
             controller.setOnConfirm(text -> Platform.runLater(() -> showOCRConfirmation(text)));
 
-            controller.displayPage(page); // Go to correct page
+            controller.displayPage(page);
 
             controller.restoreSelection(nx, ny, nw, nh);
 
@@ -640,7 +680,6 @@ public class FlashcardGUIController {
 
     private void createFlashcardsFromExtractedText(String confirmedText) {
         try {
-            // Save original OCR so Retry always uses the same source material
             lastExtractedText = confirmedText;
 
             aiGeneratedCard = llm.generateFlashcard(confirmedText);
