@@ -21,6 +21,7 @@
 
                 <Button text="Zoom -" onAction="#onZoomOut"/>
                 <Button text="Zoom +" onAction="#onZoomIn"/>
+                <Button text="Fit Width" onAction="#onFitWidth"/>
                 <Button text="Reset" onAction="#onZoomReset"/>
 
                 <ToggleButton fx:id="selectModeToggle"
@@ -29,8 +30,8 @@
 
                 <Button text="Confirm" onAction="#onConfirm"/>
                 <Button text="Close" onAction="#onCancel"/>
-
-                <Label fx:id="pageLabel" text="Page 1"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="pageLabel" text="Page 1" style="-fx-padding: 0 15 0 0;"/>
             </HBox>
         </VBox>
     </top>

@@ -25,22 +25,19 @@ public class FlashcardGUIController {
     @FXML private VBox deckListPanel;
     @FXML private ListView<String> deckSummaryList;
     @FXML private Label topTitleLabel;
-    @FXML private ListView<String> flashcardList;
     @FXML private Button showAnswerButton;
     @FXML private VBox aiPreviewBox;
     @FXML private Label aiQuestionLabel;
     @FXML private Label aiAnswerLabel;
 
-
     private Flashcard currentCard;
     private Flashcard aiGeneratedCard;
-
+    private String lastExtractedText;
     private final LlamaLLM llm = new LlamaLLM();
 
     @FXML
     public void initialize() {
         FlashcardStorageHandler.autoInit();
-        refreshList();
         refreshDeckSummaryList();
 
         topTitleLabel.setText("AI Study Tool");
@@ -136,19 +133,6 @@ public class FlashcardGUIController {
         flashcardPanel.setManaged(false);
 
         refreshDeckSummaryList();
-    }
-
-    private void refreshList() {
-        if (flashcardList == null) return;
-
-        flashcardList.getItems().clear();
-
-        FlashcardController active = DeckHandler.getActiveDeck();
-        if (active == null) return;
-
-        for (Flashcard c : active.getFlashcards()) {
-            flashcardList.getItems().add("[" + c.getCategory() + "] " + c.getQuestion());
-        }
     }
 
     public void displayCard(Flashcard card) {
@@ -346,7 +330,6 @@ public class FlashcardGUIController {
         chosenDeck.addCard(card);
         DeckHandler.setActiveDeck(chosenDeck);
 
-        refreshList();
         refreshDeckSummaryList();
         autoSaveDecks();
         updateTopLabelStats(chosenDeck);
@@ -383,7 +366,6 @@ public class FlashcardGUIController {
         refreshDeckSummaryList();
         updateTopLabelStats(deck);
         autoSaveDecks();
-        refreshList();
 
         showInfo("Created new deck: " + name);
     }
@@ -414,7 +396,6 @@ public class FlashcardGUIController {
             try {
                 FlashcardStorageHandler.loadAllDecks(file.getAbsolutePath());
                 refreshDeckSummaryList();
-                refreshList();
                 showInfo("Loaded all decks.");
             } catch (IOException e) {
                 showError(e.getMessage());
@@ -477,7 +458,6 @@ public class FlashcardGUIController {
         if (confirm.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK)
             return;
 
-        // Delete deck
         boolean success = FlashcardStorageHandler.deleteDeck(chosen);
 
         if (!success) {
@@ -493,7 +473,6 @@ public class FlashcardGUIController {
         FlashcardController active = DeckHandler.getActiveDeck();
         if (active != null) {
             updateTopLabelStats(active);
-            refreshList();
         } else {
             topTitleLabel.setText("AI Study Tool");
             flashcardPanel.setVisible(false);
@@ -517,9 +496,7 @@ public class FlashcardGUIController {
 
             Runnable refresh = () -> {
                 refreshDeckSummaryList();
-                refreshList();
 
-                // Return UI to Home mode
                 topTitleLabel.setText("AI Study Tool");
                 deckListPanel.setVisible(true);
                 deckListPanel.setManaged(true);
@@ -663,20 +640,21 @@ public class FlashcardGUIController {
 
     private void createFlashcardsFromExtractedText(String confirmedText) {
         try {
-            // Generate flashcard using LLM
+            // Save original OCR so Retry always uses the same source material
+            lastExtractedText = confirmedText;
+
             aiGeneratedCard = llm.generateFlashcard(confirmedText);
 
-            // Fill preview UI
             aiQuestionLabel.setText(aiGeneratedCard.getQuestion());
             aiAnswerLabel.setText(aiGeneratedCard.getAnswer());
 
             showAIPreviewPopup();
 
-
         } catch (Exception e) {
             showError("AI Flashcard generation failed:\n" + e.getMessage());
         }
     }
+
 
     private void showAIPreviewPopup() {
         try {
@@ -689,7 +667,6 @@ public class FlashcardGUIController {
             controller.setFlashcard(aiGeneratedCard);
 
             controller.setOnAddCallback(() -> {
-                refreshList();
                 refreshDeckSummaryList();
                 updateTopLabelStats(DeckHandler.getActiveDeck());
                 autoSaveDecks();
@@ -699,14 +676,13 @@ public class FlashcardGUIController {
 
             controller.setOnRetryCallback(() -> {
                 try {
-                    Flashcard card = controller.getFlashcard();
-                    String src = card.getQuestion() + "\n" + card.getAnswer();
-                    aiGeneratedCard = llm.generateFlashcard(src);
+                    aiGeneratedCard = llm.generateFlashcard(lastExtractedText);
                     controller.setFlashcard(aiGeneratedCard);
                 } catch (Exception ex) {
                     showError("Retry failed: " + ex.getMessage());
                 }
             });
+
 
             Stage popup = new Stage();
             popup.setTitle("AI Flashcard Preview");
@@ -763,7 +739,6 @@ public class FlashcardGUIController {
             aiPreviewBox.setVisible(false);
             aiPreviewBox.setManaged(false);
 
-            refreshList();
             refreshDeckSummaryList();
             updateTopLabelStats(deck);
             autoSaveDecks();

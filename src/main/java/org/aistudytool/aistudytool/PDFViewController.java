@@ -21,11 +21,11 @@ import java.io.File;
 
 public class PDFViewController {
 
+    @FXML public StackPane pdfContainer;
     @FXML private ImageView pdfImageView;
     @FXML private Pane overlayPane;
     @FXML private Label pageLabel;
     @FXML private ScrollPane scrollPane;
-    @FXML private StackPane pdfContainer;
     @FXML private ToggleButton selectModeToggle;
 
     private PDDocument document;
@@ -88,6 +88,24 @@ public class PDFViewController {
         pdfImageView.setFitHeight(scaledH);
         overlayPane.setPrefSize(scaledW, scaledH);
     }
+
+    @FXML
+    private void onFitWidth() {
+        Image img = pdfImageView.getImage();
+        if (img == null) return;
+
+        double imgWidth = img.getWidth();
+        double viewWidth = scrollPane.getViewportBounds().getWidth();
+
+        if (viewWidth == 0) {
+            scrollPane.viewportBoundsProperty().addListener((_, _, _) -> onFitWidth());
+            return;
+        }
+
+        zoomFactor = viewWidth / imgWidth;
+        applyZoom();
+    }
+
 
     @FXML private void onZoomIn() {
         zoomFactor = Math.min(zoomFactor * 1.25, 5.0);
@@ -301,9 +319,18 @@ public class PDFViewController {
     }
 
     private void closeWindow() {
+        try {
+            if (document != null) {
+                document.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         Stage stage = (Stage) overlayPane.getScene().getWindow();
         stage.close();
     }
+
 
     private String extractText() throws Exception {
         if (selectionRect == null)
