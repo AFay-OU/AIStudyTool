@@ -744,6 +744,92 @@ public class FlashcardGUIController {
         );
     }
 
+    @FXML
+    private void onGenerateStudyGuide() {
+        var decks = DeckHandler.getDecks();
+        if (decks.isEmpty()) {
+            showError("No decks exist.");
+            return;
+        }
+
+        ChoiceDialog<FlashcardController> dialog =
+                new ChoiceDialog<>(DeckHandler.getActiveDeck(), decks);
+
+        dialog.setHeaderText("Choose a deck to generate a study guide");
+        dialog.setContentText("Deck:");
+
+        FlashcardController chosenDeck = dialog.showAndWait().orElse(null);
+        if (chosenDeck == null) return;
+
+        if (chosenDeck.getTotalCards() == 0) {
+            showInfo("This deck has no flashcards.");
+            return;
+        }
+
+        generateStudyGuideFromDeck(chosenDeck);
+    }
+
+    private void generateStudyGuideFromDeck(FlashcardController deck) {
+        try {
+            StringBuilder sb = new StringBuilder();
+
+            for (Flashcard fc : deck.getFlashcards()) {
+                sb.append("Q: ").append(fc.getQuestion()).append("\n");
+                sb.append("A: ").append(fc.getAnswer()).append("\n\n");
+            }
+
+            String raw = sb.toString();
+            String guide = llm.generateStudyGuide(raw);
+
+            showStudyGuidePopup(guide);
+
+        } catch (Exception e) {
+            showError("Failed to generate study guide:\n" + e.getMessage());
+        }
+    }
+
+    private void showStudyGuidePopup(String text) {
+        TextArea area = new TextArea(text);
+        area.setWrapText(true);
+        area.setEditable(false);
+        area.setPrefWidth(650);
+        area.setPrefHeight(500);
+
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("Generated Study Guide");
+
+        ButtonType saveBtn = new ButtonType("Save to File", ButtonBar.ButtonData.OK_DONE);
+        ButtonType closeBtn = new ButtonType("Close", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        dialog.getDialogPane().getButtonTypes().addAll(saveBtn, closeBtn);
+        dialog.getDialogPane().setContent(area);
+
+        dialog.setResultConverter(btn -> {
+            if (btn == saveBtn) {
+                saveStudyGuideToFile(text);
+            }
+            return null;
+        });
+
+        dialog.showAndWait();
+    }
+
+    private void saveStudyGuideToFile(String text) {
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Save Study Guide");
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text Files", "*.txt"));
+
+        File file = fc.showSaveDialog(null);
+        if (file == null) return;
+
+        try (var out = new java.io.FileWriter(file)) {
+            out.write(text);
+            showInfo("Study guide saved.");
+        } catch (Exception e) {
+            showError("Failed to save file: " + e.getMessage());
+        }
+    }
+
     // Helpers
     private void showError(String msg) {
         new Alert(Alert.AlertType.ERROR, msg).show();

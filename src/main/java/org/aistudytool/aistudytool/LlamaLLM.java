@@ -6,6 +6,7 @@ import io.github.ollama4j.models.chat.OllamaChatRequest;
 import io.github.ollama4j.models.chat.OllamaChatResult;
 import io.github.ollama4j.models.chat.OllamaChatMessageRole;
 
+
 public class LlamaLLM {
 
     private final Ollama ollama;
@@ -13,6 +14,7 @@ public class LlamaLLM {
 
     public LlamaLLM() {
         this.ollama = new Ollama("http://localhost:11434");
+        ollama.setRequestTimeoutSeconds(60);
     }
 
 
@@ -72,29 +74,43 @@ public class LlamaLLM {
         return new Flashcard(q, a);
     }
 
-/*
-    public String summarize(String text) throws OllamaException {
-        String prompt =
-                "Summarize the following text in 3–5 bullet points:\n\n" + text;
+    public String generateStudyGuide(String deckContents) throws Exception {
+        String prompt = """
+    You are an expert educator.
+    Convert the following flashcards into a structured, easy-to-read **study guide**:
+
+    ---- FLASHCARD CONTENT ----
+    %s
+    ---------------------------
+
+    Produce a study guide with the following structure:
+
+    # Study Guide
+
+    ## Overview
+    - 3–5 sentence summary of the key ideas
+
+    ## Key Concepts
+    - bullet list of important terms, definitions, and explanations
+
+    ## Deep-Dive Explanations
+    - 2–5 detailed sections, each covering an important idea
+
+    ## Mnemonics & Memory Tricks
+    - provide useful mnemonic devices or analogies
+
+    ## Quick Facts / Must Know
+    - short bullet points with high-value info
+
+    ## Possible Test Questions
+    - at least 5 sample questions (not the same as the flashcards)
+
+    Keep formatting clean and readable.
+    """.formatted(deckContents);
 
         return ask(prompt);
     }
- */
 
-/*
-    public String generateDistractors(String correctAnswer, String context) throws OllamaException {
-        String prompt =
-                "Generate 3 plausible but incorrect distractor answers for:\n" +
-                        "Correct answer: " + correctAnswer + "\n\n" +
-                        "Base them on this context:\n" + context + "\n\n" +
-                        "Return as:\n" +
-                        "- Distractor 1\n" +
-                        "- Distractor 2\n" +
-                        "- Distractor 3";
-
-        return ask(prompt);
-    }
-    */
 
     private String extract(String text, String startKey, String endKey) {
         try {

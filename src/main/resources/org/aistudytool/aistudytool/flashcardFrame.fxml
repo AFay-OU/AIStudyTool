@@ -39,6 +39,7 @@
                             <MenuItem text="Edit Flashcards" onAction="#onEditFlashcards"/>
                             <MenuItem text="Add New Card" onAction="#onAddCard"/>
                             <MenuItem text="Review All Cards" onAction="#onReviewAllCards"/>
+                            <MenuItem text="Generate Study Guide" onAction="#onGenerateStudyGuide"/>
                         </Menu>
                         <Menu text="Create From">
                             <MenuItem text="Screenshot" onAction="#onStartScreenshot"/>
@@ -48,7 +49,7 @@
                     <Label fx:id="topTitleLabel"
                            text="AI Study Tool"
                            translateY="20">
-                        <font><Font name="Cambria Bold" size="30"/></font>
+                        <font><Font name="Cambria Bold" size="40"/></font>
                     </Label>
                 </VBox>
             </StackPane>
